@@ -1,7 +1,6 @@
-//imports
-//react
+//Import react
 import React, { Component } from "react";
-//materials
+//Import materials
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -13,15 +12,15 @@ import DiaWrap from '@mui/material/Dialog';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
-//components
+//Import components
 import Dialog from './dialog';
-//javascript
+// Import javascript
 import moment from 'moment';
 import toastr from 'toastr';
 import { Checkbox } from "@mui/material";
-//master export
+// Export
 export default class page extends Component {
-    //constructor
+    //Constructor
     constructor(props) {
         super(props);
         this.state = {
@@ -36,20 +35,21 @@ export default class page extends Component {
         };
     }
 
-    //add task
+    //Add a new task
     addTask() {
         this.setState({type: "add"})
         this.setState({index: -1})
         this.setState({ open: true });
     };
 
+    //Edit an existing task
     editTask(index) {
         this.setState({open: true});
         this.setState({type: "edit"});
         this.setState({index: index});
     }
 
-    //callback from dialog input
+    //Callback from dialog input
     dialogCallback = (data) => {//functional syntax intentional
         if (data.action === `submit`) {//submitted
             toastr.success(`Task added successfully!`, ``, { 'closeButton': true, positionClass: 'toast-bottom-right' });
@@ -64,6 +64,7 @@ export default class page extends Component {
         }
     }
 
+    // Edit a row
     editRow = (data) => {
         let newRows = [...this.state.rows]
         newRows[data.index] = data.data
@@ -77,7 +78,7 @@ export default class page extends Component {
         this.setState({rows: newRow})
     }
 
-    //render
+    // Render
     render() {
         return (
             <>

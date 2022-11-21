@@ -1,12 +1,13 @@
-//imports
-//react
+// Import react
 import React, { useState, useEffect } from 'react';
-//materials
+
+//Import materials
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-//components
+
+//Import components
 import DateTime from './dateTime';
 import { TextField } from '@mui/material';
 import Radio from '@mui/material/Radio';
@@ -16,29 +17,23 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import toastr from 'toastr';
 
-//master export
+// Export
 export default function ResponsiveDialog(props) {
     //variables
-    
     const [type] = useState(props.type) 
-    
     let [rows] = useState(props.rowFromParent)
-
     const [deadline, setDeadLine] = useState(isEmpty(rows) || props.index === -1 ? null : rows[props.index].deadline);
-
     const [title, setTitle] = useState(isEmpty(rows) || props.index === -1 ? null : rows[props.index].title)
-
     const [description, setDescription] = useState(isEmpty(rows) || props.index === -1 ? null : rows[props.index].description)
-
     const [priority, setPriority] = useState(isEmpty(rows) || props.index === -1 ? null : rows[props.index].priority)
-
     const [checked, setChecked] = useState(isEmpty(rows) || props.index === -1 ? null : rows[props.index].checked)
 
+    // Check if an object is empty
     function isEmpty(obj) {
         return !obj || obj.length === 0 || Object.keys(obj).length === 0;
     }
 
-    //cancel
+    // Cancel the current ticket
     let cancel = () => {
         props.parentCallback({
             action: 'cancel',
@@ -46,6 +41,7 @@ export default function ResponsiveDialog(props) {
         });
     };
 
+    // Submit a new task ticket
     let submitAdd = () => {
         if (title !== null && title !== "" && !checkDuplicate(title) && description !== null && description !== "" && priority !== "" && deadline) {
             props.parentCallback({
@@ -61,6 +57,7 @@ export default function ResponsiveDialog(props) {
         }
     };
 
+    // Submit an edit ticket to an existing task
     let submitEdit = () => {
         if (description !== null && description !== "" && priority !== "" && deadline) {
             props.parentCallback({

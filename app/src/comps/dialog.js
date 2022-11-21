@@ -47,7 +47,7 @@ export default function ResponsiveDialog(props) {
     };
 
     let submitAdd = () => {
-        if (title !== null && title !== "" && !checkDups(title) && description !== null && description !== "" && priority !== "" && deadline) {
+        if (title !== null && title !== "" && !checkDuplicate(title) && description !== null && description !== "" && priority !== "" && deadline) {
             props.parentCallback({
                 action: 'submit',
                 data: { title: title, description: description, deadline: deadline, priority: priority, checked: checked, setChecked: setChecked }
@@ -74,22 +74,23 @@ export default function ResponsiveDialog(props) {
         }
     };
 
-    let checkDups = (text) => {
-        let dup = false
+    // Check duplicate
+    let checkDuplicate = (text) => {
         for(let i = 0; i < rows.length; i++) {
             if(rows[i].title === text) {
                 return true
             }
         }
         
-        return dup
+        return false
     }
 
+    //Display warning texts in some cases for title
     let displayTitleHelperText = (title) => {
         if(title === "") {
             return "Title is Required!"
         }
-        else if(checkDups(title)) {
+        else if(checkDuplicate(title)) {
             return "Title already Existed!"
         }
         else {
@@ -97,6 +98,7 @@ export default function ResponsiveDialog(props) {
         }
     }
 
+    //Display warning texts in some cases for description
     let displayDescriptionHelperText = (title) => {
         if(description === "") {
             return "Description is Required!"
@@ -106,21 +108,20 @@ export default function ResponsiveDialog(props) {
         }
     }
 
-    //return master object
     return (
         <>
-            {/*title*/}
+            {/*Title*/}
             {type === "add" ? <DialogTitle sx={{ bgcolor: 'primary.dark', color: 'white' }}>
                 <i className="fa fa-fw fa-plus-circle"></i>Add Task
             </DialogTitle> : <DialogTitle sx={{ bgcolor: 'primary.dark', color: 'white' }}>
                 <i className="fa fa-fw fa-edit-circle"></i>Edit Task
             </DialogTitle>}
-            {/*content*/}
+            {/*Task ticket headlines*/}
             <DialogContent>
                 <br /><br />
                 {type === "add" ? 
                 <TextField
-                    error={type === "add" ? (title === "" || checkDups(title)) : false}
+                    error={type === "add" ? (title === "" || checkDuplicate(title)) : false}
                     id="title"
                     label="Title"
                     helperText={displayTitleHelperText(title)}
@@ -139,13 +140,14 @@ export default function ResponsiveDialog(props) {
                     onChange={(e) => setDescription(e.target.value)}
                 />
 
-                {/*deadline*/}
+                {/*Deadline*/}
                 <br /><br /><br />
                 <DateTime dataFromParent={deadline} dataToParent={setDeadLine} />
 
                 <br /><br /><br />
 
                 <FormControl>
+                {/*Priority*/}
                     <FormLabel id="demo-row-radio-buttons-group-label">Priority</FormLabel>
                     <RadioGroup
                         row
@@ -161,9 +163,9 @@ export default function ResponsiveDialog(props) {
                 </FormControl>
 
             </DialogContent>
-            {/*action buttons*/}
+            {/*Buttons*/}
             <DialogActions sx={{ bgcolor: 'white' }}>
-                {/*cancel button*/}
+                {/*Cancel button*/}
                 {type === 'add' ? <Button onClick={submitAdd} variant="contained" sx={{ width: 100, marginRight: '7px' }}>
                     <i className="fa fa-fw fa-plus-circle"></i>Add
                 </Button> : <Button onClick={submitEdit} variant="contained" sx={{ width: 100, marginRight: '7px' }}>

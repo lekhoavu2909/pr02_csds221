@@ -1,9 +1,10 @@
 # Project 2 - CSDS 221 README
+
 ## Aiden Le
 
 ### `cd app`
 
-Before using any command, please cd your directory to the app folder (of the project) 
+Before using any command, please cd your directory to the app folder (of the project)
 
 ## In the project directory, you can run:
 

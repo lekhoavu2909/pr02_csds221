@@ -41,8 +41,8 @@ export default function ResponsiveDialog(props) {
         });
     };
 
-    // Submit a new task ticket
-    let submitAdd = () => {
+    // Add a new task ticket
+    let actionAdd = () => {
         if (title !== null && title !== "" && !checkDuplicate(title) && description !== null && description !== "" && priority !== "" && deadline) {
             props.parentCallback({
                 action: 'submit',
@@ -57,8 +57,8 @@ export default function ResponsiveDialog(props) {
         }
     };
 
-    // Submit an edit ticket to an existing task
-    let submitEdit = () => {
+    // Edit an existing task
+    let actionEdit = () => {
         if (description !== null && description !== "" && priority !== "" && deadline) {
             props.parentCallback({
                 action: 'edit',
@@ -83,7 +83,7 @@ export default function ResponsiveDialog(props) {
     }
 
     //Display warning texts in some cases for title
-    let displayTitleHelperText = (title) => {
+    let showTitleRequired = (title) => {
         if(title === "") {
             return "Title is Required!"
         }
@@ -96,7 +96,7 @@ export default function ResponsiveDialog(props) {
     }
 
     //Display warning texts in some cases for description
-    let displayDescriptionHelperText = (title) => {
+    let showDescriptionRequired = (title) => {
         if(description === "") {
             return "Description is Required!"
         }
@@ -121,7 +121,7 @@ export default function ResponsiveDialog(props) {
                     error={type === "add" ? (title === "" || checkDuplicate(title)) : false}
                     id="title"
                     label="Title"
-                    helperText={displayTitleHelperText(title)}
+                    helperText={showTitleRequired(title)}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                 /> : null}
@@ -132,7 +132,7 @@ export default function ResponsiveDialog(props) {
                     error={type === "add" ? description === "" : false}
                     id="description"
                     label="Description"
-                    helperText= {displayDescriptionHelperText(description)}
+                    helperText= {showDescriptionRequired(description)}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                 />
@@ -163,9 +163,9 @@ export default function ResponsiveDialog(props) {
             {/*Buttons*/}
             <DialogActions sx={{ bgcolor: 'white' }}>
                 {/*Cancel button*/}
-                {type === 'add' ? <Button onClick={submitAdd} variant="contained" sx={{ width: 100, marginRight: '7px' }}>
+                {type === 'add' ? <Button onClick={actionAdd} variant="contained" sx={{ width: 100, marginRight: '7px' }}>
                     <i className="fa fa-fw fa-plus-circle"></i>Add
-                </Button> : <Button onClick={submitEdit} variant="contained" sx={{ width: 100, marginRight: '7px' }}>
+                </Button> : <Button onClick={actionEdit} variant="contained" sx={{ width: 100, marginRight: '7px' }}>
                     <i className="fa fa-fw fa-edit-circle"></i>Edit
                 </Button>}
 

@@ -19,160 +19,235 @@ import toastr from 'toastr';
 
 // Export
 export default function ResponsiveDialog(props) {
-    //variables
-    const [type] = useState(props.type) 
-    let [rows] = useState(props.rowFromParent)
-    const [deadline, setDeadLine] = useState(isEmpty(rows) || props.index === -1 ? null : rows[props.index].deadline);
-    const [title, setTitle] = useState(isEmpty(rows) || props.index === -1 ? null : rows[props.index].title)
-    const [description, setDescription] = useState(isEmpty(rows) || props.index === -1 ? null : rows[props.index].description)
-    const [priority, setPriority] = useState(isEmpty(rows) || props.index === -1 ? null : rows[props.index].priority)
-    const [checked, setChecked] = useState(isEmpty(rows) || props.index === -1 ? null : rows[props.index].checked)
+  //variables
+  const [type] = useState(props.type);
+  let [rows] = useState(props.rowFromParent);
+  const [deadline, setDeadLine] = useState(
+    isEmpty(rows) || props.index === -1 ? null : rows[props.index].deadline
+  );
+  const [title, setTitle] = useState(
+    isEmpty(rows) || props.index === -1 ? null : rows[props.index].title
+  );
+  const [description, setDescription] = useState(
+    isEmpty(rows) || props.index === -1 ? null : rows[props.index].description
+  );
+  const [priority, setPriority] = useState(
+    isEmpty(rows) || props.index === -1 ? null : rows[props.index].priority
+  );
+  const [checked, setChecked] = useState(
+    isEmpty(rows) || props.index === -1 ? null : rows[props.index].checked
+  );
 
-    // Check if an object is empty
-    function isEmpty(obj) {
-        return !obj || obj.length === 0 || Object.keys(obj).length === 0;
+  // Check if an object is empty
+  function isEmpty(obj) {
+    return !obj || obj.length === 0 || Object.keys(obj).length === 0;
+  }
+
+  // Cancel the current ticket
+  let cancel = () => {
+    props.parentCallback({
+      action: 'cancel',
+      data: {},
+    });
+  };
+
+  // Add a new task ticket
+  let actionAdd = () => {
+    if (
+      title !== null &&
+      title !== '' &&
+      !checkDuplicate(title) &&
+      description !== null &&
+      description !== '' &&
+      priority !== '' &&
+      deadline
+    ) {
+      props.parentCallback({
+        action: 'submit',
+        data: {
+          title: title,
+          description: description,
+          deadline: deadline,
+          priority: priority,
+          checked: checked,
+          setChecked: setChecked,
+        },
+      });
+    }
+    if (title === null || title === '') {
+      toastr.error(`Title must not be empty!`, ``, {
+        closeButton: true,
+        positionClass: 'toast-bottom-right',
+      });
+    }
+    if (description === null || description === '') {
+      toastr.error(`Description must not be empty!`, ``, {
+        closeButton: true,
+        positionClass: 'toast-bottom-right',
+      });
+    }
+  };
+
+  // Edit an existing task
+  let actionEdit = () => {
+    if (
+      description !== null &&
+      description !== '' &&
+      priority !== '' &&
+      deadline
+    ) {
+      props.parentCallback({
+        action: 'edit',
+        data: {
+          title: title,
+          description: description,
+          deadline: deadline,
+          priority: priority,
+          checked: checked,
+          setChecked: setChecked,
+        },
+        index: props.index,
+      });
+    }
+    if (description === null || description === '') {
+      toastr.error(`Description must not be empty!`, ``, {
+        closeButton: true,
+        positionClass: 'toast-bottom-right',
+      });
+    }
+  };
+
+  // Check duplicate
+  let checkDuplicate = (text) => {
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i].title === text) {
+        return true;
+      }
     }
 
-    // Cancel the current ticket
-    let cancel = () => {
-        props.parentCallback({
-            action: 'cancel',
-            data: {}
-        });
-    };
+    return false;
+  };
 
-    // Add a new task ticket
-    let actionAdd = () => {
-        if (title !== null && title !== "" && !checkDuplicate(title) && description !== null && description !== "" && priority !== "" && deadline) {
-            props.parentCallback({
-                action: 'submit',
-                data: { title: title, description: description, deadline: deadline, priority: priority, checked: checked, setChecked: setChecked }
-            });
-        }
-        if(title === null || title === ""){
-            toastr.error(`Title must not be empty!`, ``, { 'closeButton': true, positionClass: 'toast-bottom-right' });
-        }
-        if(description === null || description === ""){
-            toastr.error(`Description must not be empty!`, ``, { 'closeButton': true, positionClass: 'toast-bottom-right' });
-        }
-    };
+  //Display warning texts in some cases for title
+  let showTitleRequired = (title) => {
+    if (title === '') {
+      return 'Title is Required!';
+    } else if (checkDuplicate(title)) {
+      return 'Title already Existed!';
+    } else {
+      return '';
+    }
+  };
 
-    // Edit an existing task
-    let actionEdit = () => {
-        if (description !== null && description !== "" && priority !== "" && deadline) {
-            props.parentCallback({
-                action: 'edit',
-                data: { title: title, description: description, deadline: deadline, priority: priority, checked: checked, setChecked: setChecked },
-                index: props.index
-            });
-        }
-        if(description === null || description === ""){
-            toastr.error(`Description must not be empty!`, ``, { 'closeButton': true, positionClass: 'toast-bottom-right' });
-        }
-    };
+  //Display warning texts in some cases for description
+  let showDescriptionRequired = (title) => {
+    if (description === '') {
+      return 'Description is Required!';
+    } else {
+      return '';
+    }
+  };
 
-    // Check duplicate
-    let checkDuplicate = (text) => {
-        for(let i = 0; i < rows.length; i++) {
-            if(rows[i].title === text) {
-                return true
+  return (
+    <>
+      {/*Title*/}
+      {type === 'add' ? (
+        <DialogTitle sx={{ bgcolor: 'primary.dark', color: 'white' }}>
+          <i className="fa fa-fw fa-plus-circle"></i>Add Task
+        </DialogTitle>
+      ) : (
+        <DialogTitle sx={{ bgcolor: 'primary.dark', color: 'white' }}>
+          <i className="fa fa-fw fa-edit"></i>Edit Task
+        </DialogTitle>
+      )}
+      {/*Task ticket headlines*/}
+      <DialogContent>
+        <br />
+        <br />
+        {type === 'add' ? (
+          <TextField
+            error={
+              type === 'add' ? title === '' || checkDuplicate(title) : false
             }
-        }
-        
-        return false
-    }
+            id="title"
+            label="Title"
+            helperText={showTitleRequired(title)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        ) : null}
 
-    //Display warning texts in some cases for title
-    let showTitleRequired = (title) => {
-        if(title === "") {
-            return "Title is Required!"
-        }
-        else if(checkDuplicate(title)) {
-            return "Title already Existed!"
-        }
-        else {
-            return ""
-        }
-    }
+        <br />
+        <br />
+        <br />
 
-    //Display warning texts in some cases for description
-    let showDescriptionRequired = (title) => {
-        if(description === "") {
-            return "Description is Required!"
-        }
-        else {
-            return ""
-        }
-    }
+        <TextField
+          error={type === 'add' ? description === '' : false}
+          id="description"
+          label="Description"
+          helperText={showDescriptionRequired(description)}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
 
-    return (
-        <>
-            {/*Title*/}
-            {type === "add" ? <DialogTitle sx={{ bgcolor: 'primary.dark', color: 'white' }}>
-                <i className="fa fa-fw fa-plus-circle"></i>Add Task
-            </DialogTitle> : <DialogTitle sx={{ bgcolor: 'primary.dark', color: 'white' }}>
-                <i className="fa fa-fw fa-edit-circle"></i>Edit Task
-            </DialogTitle>}
-            {/*Task ticket headlines*/}
-            <DialogContent>
-                <br /><br />
-                {type === "add" ? 
-                <TextField
-                    error={type === "add" ? (title === "" || checkDuplicate(title)) : false}
-                    id="title"
-                    label="Title"
-                    helperText={showTitleRequired(title)}
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                /> : null}
+        {/*Deadline*/}
+        <br />
+        <br />
+        <br />
+        <DateTime dataFromParent={deadline} dataToParent={setDeadLine} />
 
-                <br /><br /><br />
+        <br />
+        <br />
+        <br />
 
-                <TextField
-                    error={type === "add" ? description === "" : false}
-                    id="description"
-                    label="Description"
-                    helperText= {showDescriptionRequired(description)}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                />
+        <FormControl>
+          {/*Priority*/}
+          <FormLabel id="demo-row-radio-buttons-group-label">
+            Priority
+          </FormLabel>
+          <RadioGroup
+            row
+            aria-labelledby="priority"
+            name="priority"
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+          >
+            <FormControlLabel value="low" control={<Radio />} label="Low" />
+            <FormControlLabel value="med" control={<Radio />} label="Med" />
+            <FormControlLabel value="high" control={<Radio />} label="High" />
+          </RadioGroup>
+        </FormControl>
+      </DialogContent>
+      {/*Buttons*/}
+      <DialogActions sx={{ bgcolor: 'white' }}>
+        {/*Cancel button*/}
+        {type === 'add' ? (
+          <Button
+            onClick={actionAdd}
+            variant="contained"
+            sx={{ width: 100, marginRight: '7px' }}
+          >
+            <i className="fa fa-fw fa-plus-circle"></i>Add
+          </Button>
+        ) : (
+          <Button
+            onClick={actionEdit}
+            variant="contained"
+            sx={{ width: 100, marginRight: '7px' }}
+          >
+            <i className="fa fa-fw fa-edit"></i>Edit
+          </Button>
+        )}
 
-                {/*Deadline*/}
-                <br /><br /><br />
-                <DateTime dataFromParent={deadline} dataToParent={setDeadLine} />
-
-                <br /><br /><br />
-
-                <FormControl>
-                {/*Priority*/}
-                    <FormLabel id="demo-row-radio-buttons-group-label">Priority</FormLabel>
-                    <RadioGroup
-                        row
-                        aria-labelledby="priority"
-                        name="priority"
-                        value={priority}
-                        onChange={(e) => setPriority(e.target.value)}
-                    >
-                        <FormControlLabel value="low" control={<Radio />} label="Low" />
-                        <FormControlLabel value="med" control={<Radio />} label="Med" />
-                        <FormControlLabel value="high" control={<Radio />} label="High" />
-                    </RadioGroup>
-                </FormControl>
-
-            </DialogContent>
-            {/*Buttons*/}
-            <DialogActions sx={{ bgcolor: 'white' }}>
-                {/*Cancel button*/}
-                {type === 'add' ? <Button onClick={actionAdd} variant="contained" sx={{ width: 100, marginRight: '7px' }}>
-                    <i className="fa fa-fw fa-plus-circle"></i>Add
-                </Button> : <Button onClick={actionEdit} variant="contained" sx={{ width: 100, marginRight: '7px' }}>
-                    <i className="fa fa-fw fa-edit-circle"></i>Edit
-                </Button>}
-
-                <Button onClick={cancel} variant="contained" color='error' sx={{ bgcolor: '#f44336', width: 100 }}>
-                    <i className="fa fa-fw fa-ban"></i>&nbsp;Cancel
-                </Button>
-            </DialogActions>
-        </>
-    );
+        <Button
+          onClick={cancel}
+          variant="contained"
+          color="error"
+          sx={{ bgcolor: '#f44336', width: 100 }}
+        >
+          <i className="fa fa-fw fa-ban"></i>&nbsp;Cancel
+        </Button>
+      </DialogActions>
+    </>
+  );
 }
